@@ -1,6 +1,0 @@
-syntax="proto2";
-message Entropy {
-  required string request=1;
-  required string data=2;
-  optional string version=3;
-}
