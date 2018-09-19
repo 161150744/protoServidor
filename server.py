@@ -15,6 +15,7 @@ import response_pb2 as response
 def clientHMAC(request):
     data = requestcommand + requestpVersion + requesturl + requestcId + requestcInfo + requestencoding + requestcontent
     return str(hmac.new(b'passwd', data).hexdigest())
+
 #Tira o HMAC do server
 def serverHMAC(request):
     data = signature = response.status + response.pVersion + response.url + response.sInfo + response.encoding + response.content + response.signature
@@ -38,13 +39,19 @@ def connect(connection, address):
                 sendRequest(connection, response)
             else:
                 #funError()
+                #Obs: tem que enviar uma requisição do mesmo jeito
+                #sendo essa uma requisição que vai dar erro
     connection.close()
 
+#Função que envia requisição
+#Serializa a porra toda, encapota e envia
 def sendRequest(sock, request):
     data = request.SerializeToString()
     size = struct.pack('>L', len(data))
     sock.sendall(size + data)
 
+#Função que retorna a requisição
+#Faz o inverso da de cima
 def receiveRequest(sock, request):
     while 1:
         print("Listening...")
@@ -66,9 +73,10 @@ def createServer(IP, PORT):
         try:
             sock.bind((IP, int(PORT))) 
             sock.listen(10)
+            logging.info("Server open in {0}".format(PORT))
         except:
             logging.info("Fail to open server")
-        logging.info("Server open in {0}".format(PORT))
+        
         #Chama a função que contém as opções de requisição
         while 1:
             connection, address = sock.accept()
