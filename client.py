@@ -48,7 +48,6 @@ def createConnection(IP, PORT):
 		req.command = command
 		req.url = input("URL: ")
 		req.cId = clientId
-		print(req.cId)
 		req.pVersion="Version: 1.0"
 		req.cInfo="Version: 1.0"
 		req.encoding="utf-8"
@@ -83,6 +82,8 @@ def createConnection(IP, PORT):
 				print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was created!".format(resp.url))
+				elif ("ERRO 0"):
+					print("File {0} created by another client, please try again using aother file name".format(resp.url))
 				else:
 					print("Error creating file!")
 			elif req.command.upper() == "DELETE":

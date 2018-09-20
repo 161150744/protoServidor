@@ -16,17 +16,17 @@ from communication import (
     send_message, recv_message
 )
 
-def clientHMAC(req):
+def clientHMAC(req):#assinatura cliente
     data = req.command + req.pVersion + req.url + req.cId + req.cInfo + req.encoding + req.content
     return str(hmac.new(b'passwd', data.encode("UTF-8")).hexdigest())
 
-def serverHMAC(req):
+def serverHMAC(req):#assinatura servidor
     data = req.status + req.pVersion + req.url + req.sInfo + req.encoding + req.content
     return str(hmac.new(b'passwd', data.encode("UTF-8")).hexdigest())
 
-def connect(connection, address):
+def connect(connection, address):#recebe a mensagem, identifica quem o pedido e retorna uma resposta
     command = {"GET":GET, "POST":POST, "DELETE":DELETE}
-    if not os.path.exists("./_Arq"):
+    if not os.path.exists("./_Arq"):#se a pasta que guarda os arquivos não existe, cria ela
         os.makedirs("_Arq")
     while 1:
         req = receiveRequest(connection, request.Request)
@@ -37,18 +37,18 @@ def connect(connection, address):
                 res.signature = serverHMAC(res)
                 sendRequest(connection, res)
 
-def GET(req):
+def GET(req):#função que responde o get
     res = response.Response()
     try:
-        if req.url == "/":
+        if req.url == "/":#se pedir o /, retorna o index
             file = open("./_Arq/index.html")
         else:
-            file = open("{0}/{1}".format("./_Arq/", req.url))
+            file = open("{0}/{1}".format("./_Arq/", req.url))#se não, retorna a url pedida
         res.content = file.read()
         file.close()
         logging.info("200 - OK - GET")
         res.status = "200 - OK - GET"
-    except:
+    except:#se não conseguir manda mensagem de erro
         res.content = ""
         logging.info("404 - NOT FOUND")
         res.status = "404 - NOT FOUND"
@@ -59,20 +59,35 @@ def GET(req):
     return res
 
 
-def POST(req):
+def POST(req):#responsavel pelo post
     res = response.Response()
-    try:
-        file = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
-        file.write(req.content)
-        file.close()
-        file2 = open("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url.split('/')[len(req.url.split('/'))-1]), "w")
-        file2.write(".")
-        file2.close()
-        logging.info("200 - OK - POST")
-        res.status = "200 - OK - POST"
-    except:
-        res.status = "403 - FORBIDDEN - POST"
-        logging.info("403 - FORBIDDEN - POST")
+    if(os.path.isfile("{0}/{1}".format("./_Arq", req.url))):#se a url existe
+        if(os.path.isfile("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))):#e o cliente tem permissão
+            try:#tenta sobrescrever o arquivo
+                file = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
+                file.write(req.content)
+                file.close()
+                file2 = open("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url.split('/')[len(req.url.split('/'))-1]), "w")#cria um arquivo secundario com o id do cliente que criou a url e a url
+                file2.write(".")
+                file2.close()
+                logging.info("200 - OK - POST")
+                res.status = "OK"
+            except:
+                res.status = "ERROR"
+        else:#se o cliente não tem permissão, manda mensagem de erro
+            res.status = "ERROR 0"
+    else:#se o arquivo não existe, tenta criar
+        try:
+            file = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
+            file.write(req.content)
+            file.close()
+            file2 = open("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url.split('/')[len(req.url.split('/'))-1]), "w")
+            file2.write(".")
+            file2.close()
+            logging.info("200 - OK - POST")
+            res.status = "OK"
+        except:
+            res.status = "ERROR"
     res.pVersion="Version: 1.0"
     res.url="{0}/{1}".format("./_Arq", req.url)
     res.sInfo="Version: 1.0"
@@ -80,14 +95,14 @@ def POST(req):
     res.content=req.content
     return res
 
-def DELETE(req):
+def DELETE(req):#responsavel pelo delete
     res = response.Response()
-    if(os.path.isfile("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))):
+    if(os.path.isfile("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))):#testa se o cliente tem permissão. Se tiver, deleta o arquivo principal e o secundario
         os.remove("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))
         os.remove("{0}/{1}".format("./_Arq", req.url))
         res.status = "200 - OK - DELETE"
         logging.info("200 - OK - DELETE")
-    else:
+    else:#se não tiver permissão manda uma mensagem de erro
         res.status = "403 - FORBIDDEN"
         logging.info("403 - FORBIDDEN")
     res.pVersion="Version: 1.0"
@@ -97,13 +112,12 @@ def DELETE(req):
     res.content=req.content
     return res
 
-def sendRequest(sock, req):
+def sendRequest(sock, req):#responsavel por empacotar
     data = req.SerializeToString()
     size = struct.pack('>L', len(data))
     sock.sendall(size + data)
 
-def receiveRequest(sock, req):
-
+def receiveRequest(sock, req):#responsavel por desempacotar
     len_buf = sock.recv(4)
     msg_len = struct.unpack('>L', len_buf)[0]
     msg_buf = sock.recv(msg_len)
@@ -112,7 +126,7 @@ def receiveRequest(sock, req):
    # print(msg)
     return msg
 
-def createServer(IP, PORT):
+def createServer(IP, PORT):#cria o socket
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
