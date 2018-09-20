@@ -10,11 +10,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(threadName)s:%(m
 
 import request_pb2 as request
 import response_pb2 as response
-import communication
 from pathlib import Path
-from communication import (
-    send_message, recv_message
-)
 
 def clientHMAC(req):#assinatura cliente
     data = req.command + req.pVersion + req.url + req.cId + req.cInfo + req.encoding + req.content

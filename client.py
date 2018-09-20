@@ -6,6 +6,8 @@ import response_pb2 as response
 import server
 import struct
 
+
+#Função de ajuda para mostrar os comandos disponíveis
 def help():
 	print("Options:")
 	print("GET - Get something from the server")
@@ -14,16 +16,18 @@ def help():
 	print("EXIT - Close connection")
 	print("OBS: The commands are not case sensitive. \n")
 
+#Função que testa se o comando está disponível
 def isAvailable(command):
 	lista = ["GET", "POST", "DELETE", "EXIT"]
 
 	for i in lista:
 		if i == command:
-			return True
+			return True #Retorna true se o comando foi encontrado
 	print("\n\nINVALID COMMAND!\nTRY AGAIN:")
 	help()
 	return False
 
+#Cria função que conecta o cliente ao servidor
 def createConnection(IP, PORT):
 	#Cria o socket e tenta conectar
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,8 +41,12 @@ def createConnection(IP, PORT):
 	#Pega o comando do usuário
 	command = ""
 	clientId = str(random.randint(1000,9999))
+
+	#Estabelece a conexão enquanto o cliente quiser
 	while(command != "EXIT"):
 		command = command = input("Type your command:").upper()
+		
+		#Gambiarra pra testar se o comando digitado está disponível
 		if(command == "EXIT"):
 			break
 		if(not isAvailable(command)):
@@ -48,6 +56,7 @@ def createConnection(IP, PORT):
 		req.command = command
 		req.url = input("URL: ")
 		req.cId = clientId
+		print(req.cId)
 		req.pVersion="Version: 1.0"
 		req.cInfo="Version: 1.0"
 		req.encoding="utf-8"
@@ -68,7 +77,8 @@ def createConnection(IP, PORT):
 	
 		#Faz HMAC do servidor
 		signature = server.serverHMAC(resp)
-		#Se for igual, houve resposta então mostra resultado
+
+		#Compara as assinaturas e retorna a resposta do servidor
 		if signature == resp.signature:
 			print("\n Server response")
 			if req.command.upper() == "GET":
@@ -82,8 +92,6 @@ def createConnection(IP, PORT):
 				print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was created!".format(resp.url))
-				elif ("ERRO 0"):
-					print("File {0} created by another client, please try again using aother file name".format(resp.url))
 				else:
 					print("Error creating file!")
 			elif req.command.upper() == "DELETE":
