@@ -61,19 +61,19 @@ def GET(req):
 def POST(req):
     res = response.Response()
     try:
-        html = open("{0}/{1}".format("./_Arq", req.url), "w")
+        html = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
         html.write(req.content)
         html.close()
         logging.info("200 - OK - POST")
         res.status = "OK"
     except:
         res.status = "ERROR"
-        res.pVersion="Version: 1.0"
-        res.url="{0}/{1}".format("./_Arq", req.url)
-        res.sInfo="Version: 1.0"
-        res.encoding="utf-8"
-        res.content=req.content
-        return res
+    res.pVersion="Version: 1.0"
+    res.url="{0}/{1}".format("./_Arq", req.url)
+    res.sInfo="Version: 1.0"
+    res.encoding="utf-8"
+    res.content=req.content
+    return res
 
 def DELETE(req):
     res = response.Response()

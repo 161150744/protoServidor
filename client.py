@@ -37,9 +37,9 @@ def createConnection(IP, PORT):
 		if((req.command == "GET") or (req.command == "DELETE")):
 			req.content = ""
 		else: #Se for post, busca o arquivo e coloca o seu conteúdo na requisição
-			if(os.path.exists("{0}.html".format(req.url))):
-				file = open("{0}.html".format(req.url), 'r')
-				req.content += file.read()
+			if(os.path.exists("{0}".format(req.url))):
+				file = open("{0}".format(req.url), 'r')
+				req.content = file.read()
 				file.close()
 		#Faz o HMAC da requisição
 		req.signature = server.clientHMAC(req)
