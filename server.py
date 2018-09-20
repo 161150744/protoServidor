@@ -50,6 +50,7 @@ def GET(req):
         res.status = "200 - OK"
     except:
         res.content = ""
+        logging.info("404 - NOT FOUND")
         res.status = "404 - NOT FOUND"
     res.pVersion="Version: 1.0"
     res.url="{0}/{1}".format("./_Arq/", req.url)
@@ -71,6 +72,7 @@ def POST(req):
         res.status = "OK"
     except:
         res.status = "ERROR"
+        logging.info("200 - OK - GET")
     res.pVersion="Version: 1.0"
     res.url="{0}/{1}".format("./_Arq", req.url)
     res.sInfo="Version: 1.0"
@@ -97,9 +99,6 @@ def sendRequest(sock, req):
     data = req.SerializeToString()
     size = struct.pack('>L', len(data))
     sock.sendall(size + data)
-
-def decodeVarint(data):
-    return _DecodeVarint(data, 0)[0]
 
 def receiveRequest(sock, req):
 
