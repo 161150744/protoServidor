@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\rrequest.proto\"\xaf\x01\n\x07Request\x12\x0f\n\x07\x63ommand\x18\x01 \x02(\t\x12\x1e\n\x08pVersion\x18\x02 \x02(\t:\x0cVersion: 1.0\x12\x0b\n\x03url\x18\x03 \x02(\t\x12\x0b\n\x03\x63Id\x18\x04 \x02(\t\x12\x1b\n\x05\x63Info\x18\x05 \x02(\t:\x0cVersion: 1.0\x12\x18\n\tenconding\x18\x06 \x02(\t:\x05utf-8\x12\x0f\n\x07\x63ontent\x18\x07 \x02(\t\x12\x11\n\tsignature\x18\x08 \x02(\t')
+  serialized_pb=_b('\n\rrequest.proto\"\xae\x01\n\x07Request\x12\x0f\n\x07\x63ommand\x18\x01 \x02(\t\x12\x1e\n\x08pVersion\x18\x02 \x02(\t:\x0cVersion: 1.0\x12\x0b\n\x03url\x18\x03 \x02(\t\x12\x0b\n\x03\x63Id\x18\x04 \x02(\t\x12\x1b\n\x05\x63Info\x18\x05 \x02(\t:\x0cVersion: 1.0\x12\x17\n\x08\x65ncoding\x18\x06 \x02(\t:\x05utf-8\x12\x0f\n\x07\x63ontent\x18\x07 \x02(\t\x12\x11\n\tsignature\x18\x08 \x02(\t')
 )
 
 
@@ -68,7 +68,7 @@ _REQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='enconding', full_name='Request.enconding', index=5,
+      name='encoding', full_name='Request.encoding', index=5,
       number=6, type=9, cpp_type=9, label=2,
       has_default_value=True, default_value=_b("utf-8").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -101,7 +101,7 @@ _REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=18,
-  serialized_end=193,
+  serialized_end=192,
 )
 
 DESCRIPTOR.message_types_by_name['Request'] = _REQUEST

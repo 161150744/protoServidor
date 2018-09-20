@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x0eresponse.proto\"~\n\x08Response\x12\x0e\n\x06status\x18\x01 \x02(\t\x12\x10\n\x08pVersion\x18\x02 \x02(\t\x12\x0b\n\x03url\x18\x03 \x02(\t\x12\r\n\x05sInfo\x18\x04 \x02(\t\x12\x10\n\x08\x65ncoding\x18\x05 \x02(\t\x12\x0f\n\x07\x63ontent\x18\x06 \x02(\t\x12\x11\n\tsignature\x18\x07 \x02(\t')
+  serialized_pb=_b('\n\x0eresponse.proto\"\xa1\x01\n\x08Response\x12\x0e\n\x06status\x18\x01 \x02(\t\x12\x1e\n\x08pVersion\x18\x02 \x02(\t:\x0cVersion: 1.0\x12\x0b\n\x03url\x18\x03 \x02(\t\x12\x1b\n\x05sInfo\x18\x04 \x02(\t:\x0cVersion: 1.0\x12\x17\n\x08\x65ncoding\x18\x05 \x02(\t:\x05utf-8\x12\x0f\n\x07\x63ontent\x18\x06 \x02(\t\x12\x11\n\tsignature\x18\x07 \x02(\t')
 )
 
 
@@ -42,7 +42,7 @@ _RESPONSE = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='pVersion', full_name='Response.pVersion', index=1,
       number=2, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      has_default_value=True, default_value=_b("Version: 1.0").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -56,14 +56,14 @@ _RESPONSE = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='sInfo', full_name='Response.sInfo', index=3,
       number=4, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      has_default_value=True, default_value=_b("Version: 1.0").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='encoding', full_name='Response.encoding', index=4,
       number=5, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      has_default_value=True, default_value=_b("utf-8").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -93,8 +93,8 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=18,
-  serialized_end=144,
+  serialized_start=19,
+  serialized_end=180,
 )
 
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
