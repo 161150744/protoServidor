@@ -28,15 +28,17 @@ def createConnection(IP, PORT):
 	while(command != "EXIT"):
 		req = request.Request()
 		req.command = command
-		req.url = input("URL: ").upper()
+		req.url = input("URL: ")
 		req.cId = "3" #Ainda está fix o ID do cliente
-
+		req.pVersion="Version: 1.0"
+		req.cInfo="Version: 1.0"
+		req.encoding="utf-8"
 		#Se for GET ou DELETE, não tem conteúdo na requisição
 		if((req.command == "GET") or (req.command == "DELETE")):
 			req.content = ""
 		else: #Se for post, busca o arquivo e coloca o seu conteúdo na requisição
-			if(os.path.exists(req.url)):
-				file = open(req.url, 'r')
+			if(os.path.exists("{0}.html".format(req.url))):
+				file = open("{0}.html".format(req.url), 'r')
 				req.content += file.read()
 				file.close()
 		#Faz o HMAC da requisição
@@ -44,10 +46,10 @@ def createConnection(IP, PORT):
 		#Envia a requisição
 		server.sendRequest(sock, req)
 		#Pega a resposta do servidor
-		resp = server.receiveResponse(sock, response.Response())
+		resp = server.receiveRequest(sock, response.Response())
 	
 		#Faz HMAC do servidor
-		signature = server.serverHMAC(resp)
+		signature = server.clientHMAC(resp)
 		#Se for igual, houve resposta então mostra resultado
 		if signature == resp.signature:
 			print("\n Server response")

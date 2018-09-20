@@ -31,11 +31,11 @@ def connect(connection, address):
     while 1:
         req = receiveRequest(connection, request.Request())
         if req:
-            signature = hmac.new(b'passwd', signature)
-            if signature == req:
+            signature = clientHMAC(req)
+            if signature == req.signature:
                 res = command[req.command.upper()](req)
                 res.signature = serverHMAC(res)
-                send_message(connection, res)
+                sendRequest(connection, res)
 
 def GET(req):
     res = response.Response()
@@ -47,6 +47,10 @@ def GET(req):
     except:
         res.content = ""
         res.status = "NOK"
+    res.pVersion="Version: 1.0"
+    res.url="{0}/{1}{2}".format("./_Arq/", req.url, ".html")
+    res.sInfo="Version: 1.0"
+    res.encoding="utf-8"
     return res
 
 
@@ -59,6 +63,11 @@ def POST(req):
         res.status = "OK"
     except:
         res.status = "NOK"
+    res.pVersion="Version: 1.0"
+    res.url="{0}/{1}{2}".format("./_Arq", req.url, ".html")
+    res.sInfo="Version: 1.0"
+    res.encoding="utf-8"
+    res.content=re.content
     return res
 
 def DELETE(req):
@@ -76,7 +85,7 @@ def receiveRequest(sock, req):
         buf_len = sock.recv(4)
         msg_len = struct.unpack('>L', buf_len)[0]
         msg_buf = sock.recv(msg_len)
-        message = req()
+        message = request.Request()
         message.ParseFromString(msg_buf)
         print (message)
         break
