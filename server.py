@@ -47,7 +47,7 @@ def GET(req):
         res.content = file.read()
         file.close()
         logging.info("200 - OK - GET")
-        res.status = "200 - OK"
+        res.status = "200 - OK - GET"
     except:
         res.content = ""
         logging.info("404 - NOT FOUND")
@@ -69,10 +69,10 @@ def POST(req):
         file2.write(".")
         file2.close()
         logging.info("200 - OK - POST")
-        res.status = "OK"
+        res.status = "200 - OK - POST"
     except:
-        res.status = "ERROR"
-        logging.info("200 - OK - GET")
+        res.status = "403 - FORBIDDEN - POST"
+        logging.info("403 - FORBIDDEN - POST")
     res.pVersion="Version: 1.0"
     res.url="{0}/{1}".format("./_Arq", req.url)
     res.sInfo="Version: 1.0"
@@ -85,9 +85,11 @@ def DELETE(req):
     if(os.path.isfile("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))):
         os.remove("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))
         os.remove("{0}/{1}".format("./_Arq", req.url))
-        res.status = "OK"
+        res.status = "200 - OK - DELETE"
+        logging.info("200 - OK - DELETE")
     else:
-        res.status = "ERRO"
+        res.status = "403 - FORBIDDEN"
+        logging.info("403 - FORBIDDEN")
     res.pVersion="Version: 1.0"
     res.url="{0}/{1}".format("./_Arq", req.url)
     res.sInfo="Version: 1.0"

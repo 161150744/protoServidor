@@ -6,12 +6,23 @@ import response_pb2 as response
 import server
 import struct
 
-def availableFuncHelp():
+def help():
 	print("Options:")
 	print("GET - Get something from the server")
 	print("POST - Send something to the server")
 	print("DELETE - Delete something from the server")
 	print("EXIT - Close connection")
+	print("OBS: The commands are not case sensitive. \n")
+
+def isAvailable(command):
+	lista = ["GET", "POST", "DELETE", "EXIT"]
+
+	for i in lista:
+		if i == command:
+			return True
+	print("\n\nINVALID COMMAND!\nTRY AGAIN:")
+	help()
+	return False
 
 def createConnection(IP, PORT):
 	#Cria o socket e tenta conectar
@@ -22,11 +33,17 @@ def createConnection(IP, PORT):
 	except ConnectionRefusedError:
 		print("Could not connect! Exiting...")
 		exit(1)
-	availableFuncHelp() #Mostra funções disponíveis
+	help() #Mostra funções disponíveis
 	#Pega o comando do usuário
+	command = ""
 	clientId = str(random.randint(1000,9999))
-	command = input("Type your command:").upper()
 	while(command != "EXIT"):
+		command = command = input("Type your command:").upper()
+		if(command == "EXIT"):
+			break
+		if(not isAvailable(command)):
+			command = ""
+			continue
 		req = request.Request()
 		req.command = command
 		req.url = input("URL: ")
@@ -56,20 +73,20 @@ def createConnection(IP, PORT):
 		if signature == resp.signature:
 			print("\n Server response")
 			if req.command.upper() == "GET":
-				#print("Status:", resp.status)
+				print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("Content:")
 					print(resp.content)
 				else:
 					print("File not found")
 			elif req.command.upper() == "POST":
-				#print("Status:", resp.status)
+				print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was created!".format(resp.url))
 				else:
 					print("Error creating file!")
 			elif req.command.upper() == "DELETE":
-				#print("Status:", resp.status)
+				print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was successful deleated!")
 				else:
@@ -78,9 +95,8 @@ def createConnection(IP, PORT):
 				#print("Status:", resp.status)
 				print("Command not found!")
 		#Ao final, mostra as opções para fazer uma nova requisição
-		availableFuncHelp()
-		print("_______New Request______")
-		command = input("Type your command:").upper()
+		print(" \n_______New Request_______")
+		help()
 
 def main(argv):
     IP, PORT = argv
