@@ -4,6 +4,7 @@ import random
 import request_pb2 as request
 import response_pb2 as response
 import server
+import struct
 
 def availableFuncHelp():
 	print("Options:")
@@ -21,19 +22,18 @@ def createConnection(IP, PORT):
 	except ConnectionRefusedError:
 		print("Could not connect! Exiting...")
 		exit(1)
-
+	availableFuncHelp() #Mostra funções disponíveis
 	#Pega o comando do usuário
 	command = input("Type your command:").upper()
-	availableFuncHelp() #Mostra funções disponíveis
 	while(command != "EXIT"):
 		req = request.Request()
 		req.command = command
 		req.url = input("URL: ").upper()
-		req.cId = 3 #Ainda está fix o ID do cliente
+		req.cId = "3" #Ainda está fix o ID do cliente
 
 		#Se for GET ou DELETE, não tem conteúdo na requisição
 		if((req.command == "GET") or (req.command == "DELETE")):
-			message.content = ""
+			req.content = ""
 		else: #Se for post, busca o arquivo e coloca o seu conteúdo na requisição
 			if(os.path.exists(req.url)):
 				file = open(req.url, 'r')
@@ -51,20 +51,20 @@ def createConnection(IP, PORT):
 		#Se for igual, houve resposta então mostra resultado
 		if signature == resp.signature:
 			print("\n Server response")
-			if req.command == "GET":
+			if req.command.upper() == "GET":
 				#print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("Content:")
 					print(resp.content)
 				else:
 					print("File not found")
-			elif req.command == "POST":
+			elif req.command.upper() == "POST":
 				#print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was created!".format(resp.url))
 				else:
 					print("Error creating file!")
-			elif req.comman == "DELETE":
+			elif req.comman.upper() == "DELETE":
 				#print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was successful deleated!")

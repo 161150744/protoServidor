@@ -7,7 +7,7 @@ message Request
 	required string url=3;
 	required string cId=4;
 	required string cInfo=5 [default="Version: 1.0"];
-	required string enconding=6 [default="utf-8"];
+	required string encoding=6 [default="utf-8"];
 	required string content=7;
 	required string signature=8;
 }

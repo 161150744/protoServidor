@@ -4,80 +4,94 @@ import threading
 import logging
 import hmac
 import hashlib
+import struct
 
-#Não sei pra que serve isso direito
 logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(threadName)s:%(message)s')
 
 import request_pb2 as request
 import response_pb2 as response
+import communication
+from pathlib import Path
+from communication import (
+    send_message, recv_message
+)
 
-#Tira o HMAC do cliente
-def clientHMAC(request):
-    data = requestcommand + requestpVersion + requesturl + requestcId + requestcInfo + requestencoding + requestcontent
-    return str(hmac.new(b'passwd', data).hexdigest())
+def clientHMAC(req):
+    data = req.command + req.pVersion + req.url + req.cId + req.cInfo + req.encoding + req.content
+    return str(hmac.new(b'passwd', data.encode("UTF-8")).hexdigest())
 
-#Tira o HMAC do server
-def serverHMAC(request):
-    data = signature = response.status + response.pVersion + response.url + response.sInfo + response.encoding + response.content + response.signature
-    return str(hmac.new(b'passwd', data).hexdigest())   
+def serverHMAC(req):
+    data = req.status + req.pVersion + req.url + req.sInfo + req.encoding + req.content
+    return str(hmac.new(b'passwd', data.encode("UTF-8")).hexdigest())
 
-#Função que se conecta
 def connect(connection, address):
+    command = {"GET":GET, "POST":POST, "DELETE":DELETE}
+    if not os.path.exists("./_Arq"):
+        os.makedirs("_Arq")
     while 1:
-        request = receiveRequest(connection, request.Request())
-       
-        signature = hmac.new(b'passwd', signature)
-        if signature == request.signature:
-            if request.command == "DELETE":
-                #response = chamaFunDel()
-                sendRequest(connection, response)
-            else if request.command == "GET":
-                #response = chamaFunGet()
-                sendRequest(connection, response)
-            else if request.command == "POST":
-                #response = chamaFunPost()
-                sendRequest(connection, response)
-            else:
-                #funError()
-                #Obs: tem que enviar uma requisição do mesmo jeito
-                #sendo essa uma requisição que vai dar erro
-    connection.close()
+        req = receiveRequest(connection, request.Request())
+        if req:
+            signature = hmac.new(b'passwd', signature)
+            if signature == req:
+                res = command[req.command.upper()](req)
+                res.signature = serverHMAC(res)
+                send_message(connection, res)
 
-#Função que envia requisição
-#Serializa a porra toda, encapota e envia
-def sendRequest(sock, request):
-    data = request.SerializeToString()
+def GET(req):
+    res = response.Response()
+    try:
+        html = open("{0}/{1}{2}".format("./_Arq/", req.url, ".html"))
+        res.content = html.read()
+        html.close()
+        res.status = "OK"
+    except:
+        res.content = ""
+        res.status = "NOK"
+    return res
+
+
+def POST(req):
+    res = response.Response()
+    try:
+        html = open("{0}/{1}{2}".format("./_Arq", req.url, ".html"), "w")
+        html.write(req.content)
+        html.close()
+        res.status = "OK"
+    except:
+        res.status = "NOK"
+    return res
+
+def DELETE(req):
+    res = response.Response()
+    pass
+
+def sendRequest(sock, req):
+    data = req.SerializeToString()
     size = struct.pack('>L', len(data))
     sock.sendall(size + data)
 
-#Função que retorna a requisição
-#Faz o inverso da de cima
-def receiveRequest(sock, request):
+def receiveRequest(sock, req):
     while 1:
         print("Listening...")
         buf_len = sock.recv(4)
         msg_len = struct.unpack('>L', buf_len)[0]
         msg_buf = sock.recv(msg_len)
-        message = request()
+        message = req()
         message.ParseFromString(msg_buf)
         print (message)
-        
+        break
     return message
 
-#Função que cria o server
 def createServer(IP, PORT):
-    #Cria um socket
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #Vincula o socket a um endereço
         try:
             sock.bind((IP, int(PORT))) 
             sock.listen(10)
             logging.info("Server open in {0}".format(PORT))
         except:
             logging.info("Fail to open server")
-        
-        #Chama a função que contém as opções de requisição
+            exit(1)
         while 1:
             connection, address = sock.accept()
             threading.Thread(target=connect, args=(connection, address)).start()
