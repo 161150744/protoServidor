@@ -29,7 +29,7 @@ def connect(connection, address):
     if not os.path.exists("./_Arq"):
         os.makedirs("_Arq")
     while 1:
-        req = receiveRequest(connection, request.Request())
+        req = receiveRequest(connection, request.Request)
         if req:
             signature = clientHMAC(req)
             if signature == req.signature:
@@ -40,15 +40,19 @@ def connect(connection, address):
 def GET(req):
     res = response.Response()
     try:
-        html = open("{0}/{1}{2}".format("./_Arq/", req.url, ".html"))
+        if req.url == "/":
+            html = open("./_Arq/index.html")
+        else:
+            html = open("{0}/{1}".format("./_Arq/", req.url))
         res.content = html.read()
         html.close()
-        res.status = "OK"
+        logging.info("200 - OK - GET")
+        res.status = "200 - OK"
     except:
         res.content = ""
-        res.status = "NOK"
+        res.status = "404 - NOT FOUND"
     res.pVersion="Version: 1.0"
-    res.url="{0}/{1}{2}".format("./_Arq/", req.url, ".html")
+    res.url="{0}/{1}".format("./_Arq/", req.url)
     res.sInfo="Version: 1.0"
     res.encoding="utf-8"
     return res
@@ -57,18 +61,19 @@ def GET(req):
 def POST(req):
     res = response.Response()
     try:
-        html = open("{0}/{1}{2}".format("./_Arq", req.url, ".html"), "w")
+        html = open("{0}/{1}".format("./_Arq", req.url), "w")
         html.write(req.content)
         html.close()
+        logging.info("200 - OK - POST")
         res.status = "OK"
     except:
-        res.status = "NOK"
-    res.pVersion="Version: 1.0"
-    res.url="{0}/{1}{2}".format("./_Arq", req.url, ".html")
-    res.sInfo="Version: 1.0"
-    res.encoding="utf-8"
-    res.content=req.content
-    return res
+        res.status = "ERROR"
+        res.pVersion="Version: 1.0"
+        res.url="{0}/{1}".format("./_Arq", req.url)
+        res.sInfo="Version: 1.0"
+        res.encoding="utf-8"
+        res.content=req.content
+        return res
 
 def DELETE(req):
     res = response.Response()
@@ -79,17 +84,18 @@ def sendRequest(sock, req):
     size = struct.pack('>L', len(data))
     sock.sendall(size + data)
 
+def decodeVarint(data):
+    return _DecodeVarint(data, 0)[0]
+
 def receiveRequest(sock, req):
-    while 1:
-        print("Listening...")
-        buf_len = sock.recv(4)
-        msg_len = struct.unpack('>L', buf_len)[0]
-        msg_buf = sock.recv(msg_len)
-        message = request.Request()
-        message.ParseFromString(msg_buf)
-        print (message)
-        break
-    return message
+
+    len_buf = sock.recv(4)
+    msg_len = struct.unpack('>L', len_buf)[0]
+    msg_buf = sock.recv(msg_len)
+    msg = req()
+    msg.ParseFromString(msg_buf)
+   # print(msg)
+    return msg
 
 def createServer(IP, PORT):
     try:

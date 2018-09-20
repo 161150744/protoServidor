@@ -46,10 +46,10 @@ def createConnection(IP, PORT):
 		#Envia a requisição
 		server.sendRequest(sock, req)
 		#Pega a resposta do servidor
-		resp = server.receiveRequest(sock, response.Response())
+		resp = server.receiveRequest(sock, response.Response)
 	
 		#Faz HMAC do servidor
-		signature = server.clientHMAC(resp)
+		signature = server.serverHMAC(resp)
 		#Se for igual, houve resposta então mostra resultado
 		if signature == resp.signature:
 			print("\n Server response")
