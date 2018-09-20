@@ -41,11 +41,11 @@ def GET(req):
     res = response.Response()
     try:
         if req.url == "/":
-            html = open("./_Arq/index.html")
+            file = open("./_Arq/index.html")
         else:
-            html = open("{0}/{1}".format("./_Arq/", req.url))
-        res.content = html.read()
-        html.close()
+            file = open("{0}/{1}".format("./_Arq/", req.url))
+        res.content = file.read()
+        file.close()
         logging.info("200 - OK - GET")
         res.status = "200 - OK"
     except:
@@ -61,9 +61,12 @@ def GET(req):
 def POST(req):
     res = response.Response()
     try:
-        html = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
-        html.write(req.content)
-        html.close()
+        file = open("{0}/{1}".format("./_Arq", req.url.split('/')[len(req.url.split('/'))-1]), "w")
+        file.write(req.content)
+        file.close()
+        file2 = open("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url.split('/')[len(req.url.split('/'))-1]), "w")
+        file2.write(".")
+        file2.close()
         logging.info("200 - OK - POST")
         res.status = "OK"
     except:
@@ -77,7 +80,18 @@ def POST(req):
 
 def DELETE(req):
     res = response.Response()
-    pass
+    if(os.path.isfile("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))):
+        os.remove("{0}/.{1}.{2}".format("./_Arq", req.cId, req.url))
+        os.remove("{0}/{1}".format("./_Arq", req.url))
+        res.status = "OK"
+    else:
+        res.status = "ERRO"
+    res.pVersion="Version: 1.0"
+    res.url="{0}/{1}".format("./_Arq", req.url)
+    res.sInfo="Version: 1.0"
+    res.encoding="utf-8"
+    res.content=req.content
+    return res
 
 def sendRequest(sock, req):
     data = req.SerializeToString()

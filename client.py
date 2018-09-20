@@ -24,12 +24,14 @@ def createConnection(IP, PORT):
 		exit(1)
 	availableFuncHelp() #Mostra funções disponíveis
 	#Pega o comando do usuário
+	clientId = str(random.randint(1000,9999))
 	command = input("Type your command:").upper()
 	while(command != "EXIT"):
 		req = request.Request()
 		req.command = command
 		req.url = input("URL: ")
-		req.cId = "3" #Ainda está fix o ID do cliente
+		req.cId = clientId
+		print(req.cId)
 		req.pVersion="Version: 1.0"
 		req.cInfo="Version: 1.0"
 		req.encoding="utf-8"
@@ -66,7 +68,7 @@ def createConnection(IP, PORT):
 					print("File {0} was created!".format(resp.url))
 				else:
 					print("Error creating file!")
-			elif req.comman.upper() == "DELETE":
+			elif req.command.upper() == "DELETE":
 				#print("Status:", resp.status)
 				if("OK" in resp.status):
 					print("File {0} was successful deleated!")
