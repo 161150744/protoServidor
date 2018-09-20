@@ -67,7 +67,7 @@ def POST(req):
     res.url="{0}/{1}{2}".format("./_Arq", req.url, ".html")
     res.sInfo="Version: 1.0"
     res.encoding="utf-8"
-    res.content=re.content
+    res.content=req.content
     return res
 
 def DELETE(req):
